@@ -7,6 +7,6 @@
 # Credits
 
 游戏素材: [CottonGame-胖布丁游戏](https://space.bilibili.com/56370014)
-字体: [Lost Island](https://www.dafont.com/lost-island.font)
+字体: [Lost Island](https://www.dafont.com/lost-island.font)(英文)，[ZCOOL - Kuaile](https://www.zcool.com.cn/special/zcoolfonts/)(中文)
 
 感谢他们提供的教程，素材，字体。如需商业化使用相关素材或字体，请务必联系官方！
