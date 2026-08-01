@@ -1,20 +1,39 @@
+using Assets.Scripts.Interactive;
+using Assets.Scripts.Inventory.Data;
+using Assets.Scripts.Inventory.Logic;
 using Assets.Scripts.Transition;
+using Assets.Scripts.Utilities;
 using UnityEngine;
 
 namespace Assets.Scripts.Cursor
 {
     public class CursorManager : MonoBehaviour
     {
-        private Vector3 MouseWorldPos => 
+        [SerializeField] private RectTransform _hand;
+
+        private Vector3 MouseWorldPos =>
             Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
         private bool _canClick;
+        private ItemName _currentItem;
+        private bool _isHoldingItem;
+
+        private void OnEnable()
+        {
+            EventBus.SlotSelectedEvent += OnSlotSelected;
+            EventBus.ItemUsedEvent += OnItemUsed;
+        }
 
         private void Update()
         {
             _canClick = GetMouseOverCollider() != null;
 
-            if(_canClick && Input.GetMouseButtonDown(0))
+            if (_hand.gameObject.activeInHierarchy)
+            {
+                _hand.position = Input.mousePosition;
+            }
+
+            if (_canClick && Input.GetMouseButtonDown(0))
             {
                 // 处理点击事件
                 var collider = GetMouseOverCollider();
@@ -23,6 +42,12 @@ namespace Assets.Scripts.Cursor
                     OnClick(collider.gameObject);
                 }
             }
+        }
+
+        private void OnDisable()
+        {
+            EventBus.SlotSelectedEvent -= OnSlotSelected;
+            EventBus.ItemUsedEvent -= OnItemUsed;
         }
 
         private void OnClick(GameObject obj)
@@ -34,7 +59,37 @@ namespace Assets.Scripts.Cursor
                     var teleport = obj.GetComponent<Teleport>();
                     teleport.OnTeleport();
                     break;
+                case "Item":
+                    // 处理物品点击
+                    var item = obj.GetComponent<Item>();
+                    item.OnPickUp();
+                    break;
+                case "Interactive":
+                    // 处理交互点击
+                    var interactive = obj.GetComponent<InteractiveBase>();
+                    if (_isHoldingItem)
+                        interactive.Interact(_currentItem);
+                    else
+                        interactive.EmptyClick();
+                    break;
             }
+        }
+
+        private void OnSlotSelected(ItemDetails item, bool isSelected)
+        {
+            _isHoldingItem = isSelected;
+            if (isSelected)
+            {
+                _currentItem = item.name;
+            }
+            _hand.gameObject.SetActive(_isHoldingItem);
+        }
+
+        private void OnItemUsed(ItemName itemName)
+        {
+            _currentItem = ItemName.None;
+            _isHoldingItem = false;
+            _hand.gameObject.SetActive(false);
         }
 
         // 获取鼠标点击位置的碰撞体
