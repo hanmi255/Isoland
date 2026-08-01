@@ -26,20 +26,22 @@ namespace Assets.Scripts.Transition
         /// <summary>
         /// 控制淡入淡出遮罩透明度与输入拦截的画布组。
         /// </summary>
-        [SerializeField]
-        private CanvasGroup _fadeCanvasGroup = null;
+        [SerializeField] private CanvasGroup _fadeCanvasGroup = null;
 
         /// <summary>
         /// 用于显示黑幕的遮罩图像。
         /// </summary>
-        [SerializeField]
-        private Image _fadeImage = null;
+        [SerializeField] private Image _fadeImage = null;
 
         /// <summary>
         /// 单次淡入或淡出持续时间。
         /// </summary>
-        [SerializeField]
-        private float _fadeDuration = 1f;
+        [SerializeField] private float _fadeDuration = 1f;
+
+        /// <summary>
+        /// 游戏开始时的起始场景。
+        /// </summary>
+        [SerializeField] private SceneName _startScene;
 
         /// <summary>
         /// 标记当前是否正在执行淡入淡出流程。
@@ -58,7 +60,8 @@ namespace Assets.Scripts.Transition
             _fadeImage.color = new Color(0, 0, 0, 1);
             _fadeCanvasGroup.alpha = 1;
 
-            StartCoroutine(Fade(0f));
+            // StartCoroutine(Fade(0f));
+            StartCoroutine(FadeAndSwitchScenes(_startScene));
         }
 
         #endregion
@@ -90,6 +93,8 @@ namespace Assets.Scripts.Transition
 
             yield return StartCoroutine(Fade(1f));
 
+            EventBus.CallBeforeSceneUnload();
+
             if (SceneNameHelper.GetActiveSceneName() != SceneName.PersistentScene)
             {
                 yield return SceneManager.UnloadSceneAsync(
@@ -98,6 +103,8 @@ namespace Assets.Scripts.Transition
             }
 
             yield return StartCoroutine(LoadSceneAndSetActive(sceneName));
+
+            EventBus.CallAfterSceneLoad();
 
             yield return StartCoroutine(Fade(0f));
         }

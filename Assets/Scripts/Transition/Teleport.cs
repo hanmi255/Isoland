@@ -5,11 +5,11 @@ namespace Assets.Scripts.Transition
 {
     public class Teleport : MonoBehaviour
     {
-        public SceneName toScene;
+        [SerializeField] private SceneName _toScene;
 
         public void OnTeleport()
         {
-            SceneController.Instance.FadeAndLoadScene(toScene);
+            SceneController.Instance.FadeAndLoadScene(_toScene);
         }
     }
 }
