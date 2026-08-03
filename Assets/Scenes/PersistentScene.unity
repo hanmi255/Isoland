@@ -944,7 +944,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _itemData: {fileID: 11400000, guid: 02c31639028be69499e578450d2655e7, type: 2}
-  _itemList: 
 --- !u!4 &1076339359
 Transform:
   m_ObjectHideFlags: 0
@@ -1155,7 +1154,7 @@ MonoBehaviour:
   _fadeCanvasGroup: {fileID: 1518069807}
   _fadeImage: {fileID: 1518069808}
   _fadeDuration: 0.5
-  _startScene: 1
+  _startScene: 5
 --- !u!4 &1412553348
 Transform:
   m_ObjectHideFlags: 0

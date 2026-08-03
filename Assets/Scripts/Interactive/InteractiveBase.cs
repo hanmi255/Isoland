@@ -16,7 +16,7 @@ namespace Assets.Scripts.Interactive
             {
                 _isInteracted = true;
                 UseItem();
-                EventBus.CallOnItemUsed(_requiredItem);
+                EventBus.CallItemUsed(_requiredItem);
             }
         }
 

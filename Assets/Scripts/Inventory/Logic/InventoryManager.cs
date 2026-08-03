@@ -34,12 +34,12 @@ namespace Assets.Scripts.Inventory.Logic
 
             if (_itemList.Count == 0)
             {
-                EventBus.CallOnUIUpdate(null, -1);
+                EventBus.CallUIUpdated(null, -1);
             }
             else
             {
                 int newIndex = Mathf.Clamp(index, 0, _itemList.Count - 1);
-                EventBus.CallOnUIUpdate(_itemData.GetItemDetails(_itemList[newIndex]), newIndex);
+                EventBus.CallUIUpdated(_itemData.GetItemDetails(_itemList[newIndex]), newIndex);
             }
         }
 
@@ -51,7 +51,7 @@ namespace Assets.Scripts.Inventory.Logic
             _itemList.Add(itemName);
             int index = _itemList.IndexOf(itemName);
 
-            EventBus.CallOnUIUpdate(_itemData.GetItemDetails(itemName), index);
+            EventBus.CallUIUpdated(_itemData.GetItemDetails(itemName), index);
         }
 
         private void OnItemSwitched(int index)
@@ -60,18 +60,18 @@ namespace Assets.Scripts.Inventory.Logic
                 return;
 
             ItemName itemName = _itemList[index];
-            EventBus.CallOnUIUpdate(_itemData.GetItemDetails(itemName), index);
+            EventBus.CallUIUpdated(_itemData.GetItemDetails(itemName), index);
         }
 
         private void OnAfterSceneLoad()
         {
             if (_itemList.Count == 0)
             {
-                EventBus.CallOnUIUpdate(null, -1);
+                EventBus.CallUIUpdated(null, -1);
             }
             else
             {
-                EventBus.CallOnUIUpdate(_itemData.GetItemDetails(_itemList[0]), 0);
+                EventBus.CallUIUpdated(_itemData.GetItemDetails(_itemList[0]), 0);
             }
         }
     }

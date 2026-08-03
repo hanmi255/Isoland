@@ -29,7 +29,7 @@ namespace Assets.Scripts.Inventory.UI
         public void OnPointerClick(PointerEventData eventData)
         {
             _isSelected = !_isSelected;
-            EventBus.CallOnSlotSelected(_currentItem, _isSelected);
+            EventBus.CallSlotSelected(_currentItem, _isSelected);
         }
 
         public void OnPointerEnter(PointerEventData eventData)

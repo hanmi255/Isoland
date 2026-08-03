@@ -48,13 +48,13 @@ namespace Assets.Scripts.Dialogue.Logic
 
             if (data.TryPop(out var result))
             {
-                EventBus.CallOnShowDialogue(result);
+                EventBus.CallShowDialogue(result);
                 yield return null;
                 _isTalking = false;
             }
             else
             {
-                EventBus.CallOnShowDialogue(null);
+                EventBus.CallShowDialogue(null);
                 FillDialogueStacks();
                 _isTalking = false;
             }

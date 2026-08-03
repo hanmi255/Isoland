@@ -27,7 +27,7 @@ namespace Assets.Scripts.Inventory.UI
         public void SwitchItem(int direction)
         {
             int newIndex = _currentItemIndex + direction;
-            EventBus.CallOnItemSwitched(newIndex);
+            EventBus.CallItemSwitched(newIndex);
         }
 
         private void OnUIUpdate(ItemDetails itemDetails, int index)

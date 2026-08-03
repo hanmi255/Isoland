@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Assets.Scripts.Interactive;
 using Assets.Scripts.Inventory.Data;
 using Assets.Scripts.Inventory.Logic;
+using Assets.Scripts.MiniGame.Logic;
 using Assets.Scripts.Utilities;
 using UnityEngine;
 
@@ -11,12 +12,14 @@ namespace Assets.Scripts.Managers
     {
         private readonly Dictionary<ItemName, bool> _itemAvailableDic = new();
         private readonly Dictionary<string, bool> _interactiveObjectUsedDic = new();
+        private readonly Dictionary<SceneName, bool> _miniGamePassedDic = new();
 
         private void OnEnable()
         {
             EventBus.BeforeSceneUnloadEvent += OnBeforeSceneUnload;
             EventBus.AfterSceneLoadEvent += OnAfterSceneLoad;
             EventBus.UIUpdateEvent += OnUIUpdate;
+            EventBus.GameCompletedEvent += OnGameCompleted;
         }
 
         private void OnDisable()
@@ -24,6 +27,7 @@ namespace Assets.Scripts.Managers
             EventBus.BeforeSceneUnloadEvent -= OnBeforeSceneUnload;
             EventBus.AfterSceneLoadEvent -= OnAfterSceneLoad;
             EventBus.UIUpdateEvent -= OnUIUpdate;
+            EventBus.GameCompletedEvent -= OnGameCompleted;
         }
 
         private void OnBeforeSceneUnload()
@@ -47,6 +51,19 @@ namespace Assets.Scripts.Managers
                 else
                 {
                     _interactiveObjectUsedDic.Add(interactive.name, interactive.IsInteracted);
+                }
+            }
+
+            // 保存场景中小游戏的状态
+            foreach (var game in FindObjectsOfType<MiniGameEnter>())
+            {
+                if (_miniGamePassedDic.ContainsKey(game.GameName))
+                {
+                    _miniGamePassedDic[game.GameName] = game.IsCompleted;
+                }
+                else
+                {
+                    _miniGamePassedDic.Add(game.GameName, game.IsCompleted);
                 }
             }
         }
@@ -78,6 +95,20 @@ namespace Assets.Scripts.Managers
                     _interactiveObjectUsedDic.Add(interactive.name, interactive.IsInteracted);
                 }
             }
+
+            // 恢复场景中小游戏的状态
+            foreach (var game in FindObjectsOfType<MiniGameEnter>())
+            {
+                if (_miniGamePassedDic.TryGetValue(game.GameName, out bool isCompleted))
+                {
+                    game.IsCompleted = isCompleted;
+                    game.UpdateMiniGameState();
+                }
+                else
+                {
+                    _miniGamePassedDic.Add(game.GameName, game.IsCompleted);
+                }
+            }
         }
 
         // 拾取物品后，将场景中的物体隐藏
@@ -87,6 +118,11 @@ namespace Assets.Scripts.Managers
             {
                 _itemAvailableDic[itemDetails.name] = false;
             }
+        }
+
+        private void OnGameCompleted(SceneName gameName)
+        {
+            _miniGamePassedDic[gameName] = true;
         }
     }
 }
