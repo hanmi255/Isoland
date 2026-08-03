@@ -4,6 +4,7 @@ using Assets.Scripts.Inventory.Logic;
 using Assets.Scripts.Transition;
 using Assets.Scripts.Utilities;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Assets.Scripts.Cursor
 {
@@ -32,6 +33,10 @@ namespace Assets.Scripts.Cursor
             {
                 _hand.position = Input.mousePosition;
             }
+
+            // 如果鼠标在UI上，不处理点击
+            if (IsMouseOverUI())
+                return;
 
             if (_canClick && Input.GetMouseButtonDown(0))
             {
@@ -96,6 +101,12 @@ namespace Assets.Scripts.Cursor
         private Collider2D GetMouseOverCollider()
         {
             return Physics2D.OverlapPoint(MouseWorldPos);
+        }
+
+        // 检查鼠标是否在UI上
+        private bool IsMouseOverUI()
+        {
+            return EventSystem.current.IsPointerOverGameObject();
         }
     }
 }
