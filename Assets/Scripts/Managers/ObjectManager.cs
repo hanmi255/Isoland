@@ -3,19 +3,26 @@ using Assets.Scripts.Interactive;
 using Assets.Scripts.Inventory.Data;
 using Assets.Scripts.Inventory.Logic;
 using Assets.Scripts.MiniGame.Logic;
+using Assets.Scripts.SaveLoadSystem;
 using Assets.Scripts.Utilities;
 using UnityEngine;
 
 namespace Assets.Scripts.Managers
 {
-    public class ObjectManager : MonoBehaviour
+    public class ObjectManager : SingletonMonoBehaviour<ObjectManager>, ISaveable
     {
-        private readonly Dictionary<ItemName, bool> _itemAvailableDic = new();
-        private readonly Dictionary<string, bool> _interactiveObjectUsedDic = new();
-        private readonly Dictionary<SceneName, bool> _miniGamePassedDic = new();
+        private Dictionary<ItemName, bool> _itemAvailableDic = new();
+        private Dictionary<string, bool> _interactiveObjectUsedDic = new();
+        private Dictionary<SceneName, bool> _miniGamePassedDic = new();
 
         private int _currentWeek;
         private MiniGameController _currentMiniGameController;
+
+        private void Start()
+        {
+            ISaveable saveable = this;
+            saveable.SaveableRegister();
+        }
 
         private void OnEnable()
         {
@@ -35,6 +42,32 @@ namespace Assets.Scripts.Managers
             EventBus.NewWeekStartedEvent -= OnNewWeekStarted;
         }
 
+
+        #region ISaveable 接口实现
+
+        public GameSaveData GenerateSaveData()
+        {
+            GameSaveData saveData = new()
+            {
+                currentWeek = _currentWeek,
+                itemAvailableDic = _itemAvailableDic,
+                interactiveObjectUsedDic = _interactiveObjectUsedDic,
+                miniGamePassedDic = _miniGamePassedDic
+            };
+            return saveData;
+        }
+
+        public void RestoreGameData(GameSaveData saveData)
+        {
+            _currentWeek = saveData.currentWeek;
+            _itemAvailableDic = saveData.itemAvailableDic;
+            _interactiveObjectUsedDic = saveData.interactiveObjectUsedDic;
+            _miniGamePassedDic = saveData.miniGamePassedDic;
+        }
+
+        #endregion
+
+        #region Event
         private void OnBeforeSceneUnload()
         {
             // 保存场景中物品的状态
@@ -142,5 +175,7 @@ namespace Assets.Scripts.Managers
             _interactiveObjectUsedDic.Clear();
             _miniGamePassedDic.Clear();
         }
+
+        #endregion
     }
 }

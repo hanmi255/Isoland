@@ -1,3 +1,4 @@
+using Assets.Scripts.SaveLoadSystem;
 using Assets.Scripts.Utilities;
 using UnityEngine;
 
@@ -10,10 +11,10 @@ namespace Assets.Scripts.Menu
             Application.Quit();
         }
 
-        //TODO: 继续游戏
         public void ContinueGame()
         {
-
+            // 读取当前游戏进度
+            SaveLoadManager.Instance.Load();
         }
 
         public void StartNewWeekGame(int week)

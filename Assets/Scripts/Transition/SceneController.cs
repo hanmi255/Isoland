@@ -1,4 +1,5 @@
 using System.Collections;
+using Assets.Scripts.SaveLoadSystem;
 using Assets.Scripts.Utilities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -19,7 +20,7 @@ namespace Assets.Scripts.Transition
     /// <remarks>
     /// 职责：串联淡出、存档、卸载、加载、恢复和淡入等完整场景切换步骤。
     /// </remarks>
-    public class SceneController : SingletonMonoBehaviour<SceneController>
+    public class SceneController : SingletonMonoBehaviour<SceneController>, ISaveable
     {
         #region Fields
 
@@ -57,6 +58,9 @@ namespace Assets.Scripts.Transition
         /// </summary>
         private void Start()
         {
+            ISaveable saveable = this;
+            saveable.SaveableRegister();
+
             _fadeImage.color = new Color(0, 0, 0, 1);
             _fadeCanvasGroup.alpha = 1;
 
@@ -72,6 +76,24 @@ namespace Assets.Scripts.Transition
         private void OnDisable()
         {
             EventBus.NewWeekStartedEvent -= OnNewWeekStarted;
+        }
+
+        #endregion
+
+        #region ISaveable 接口实现
+
+        public GameSaveData GenerateSaveData()
+        {
+            GameSaveData saveData = new()
+            {
+                currentScene = SceneNameHelper.GetActiveSceneName()
+            };
+            return saveData;
+        }
+
+        public void RestoreGameData(GameSaveData saveData)
+        {
+            FadeAndLoadScene(saveData.currentScene);
         }
 
         #endregion
@@ -105,11 +127,17 @@ namespace Assets.Scripts.Transition
 
             EventBus.CallBeforeSceneUnload();
 
+            // 不能卸载 PersistentScene
             if (SceneNameHelper.GetActiveSceneName() != SceneName.PersistentScene)
             {
-                yield return SceneManager.UnloadSceneAsync(
-                    SceneManager.GetActiveScene().buildIndex
-                );
+                // 卸载当前场景前保存游戏
+                // 只在切换到 MainMenu 时保存游戏，由 MenuButton 触发的切换
+                if (sceneName == SceneName.MainMenu)
+                {
+                    SaveLoadManager.Instance.Save();
+                }
+
+                yield return SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene().buildIndex);
             }
 
             yield return StartCoroutine(LoadSceneAndSetActive(sceneName));

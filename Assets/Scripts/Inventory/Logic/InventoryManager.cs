@@ -1,17 +1,24 @@
 using System.Collections.Generic;
 using Assets.Scripts.Inventory.Data;
+using Assets.Scripts.SaveLoadSystem;
 using Assets.Scripts.Utilities;
 using UnityEngine;
 
 namespace Assets.Scripts.Inventory.Logic
 {
-    public class InventoryManager : SingletonMonoBehaviour<InventoryManager>
+    public class InventoryManager : SingletonMonoBehaviour<InventoryManager>, ISaveable
     {
         [Header("References")]
         [SerializeField] private SO_ItemData _itemData;
-        private readonly List<ItemName> _itemList = new();
+        private List<ItemName> _itemList = new();
 
         public int ItemCount => _itemList.Count;
+
+        private void Start()
+        {
+            ISaveable saveable = this;
+            saveable.SaveableRegister();
+        }
 
         private void OnEnable()
         {
@@ -29,6 +36,37 @@ namespace Assets.Scripts.Inventory.Logic
             EventBus.NewWeekStartedEvent -= OnNewWeekStarted;
         }
 
+        public void AddItem(ItemName itemName)
+        {
+            if (_itemList.Contains(itemName))
+                return;
+
+            _itemList.Add(itemName);
+            int index = _itemList.IndexOf(itemName);
+
+            EventBus.CallUIUpdated(_itemData.GetItemDetails(itemName), index);
+        }
+
+        #region ISaveable 接口实现
+
+        public GameSaveData GenerateSaveData()
+        {
+            GameSaveData saveData = new()
+            {
+                itemList = _itemList
+            };
+            return saveData;
+        }
+
+        public void RestoreGameData(GameSaveData saveData)
+        {
+            _itemList = saveData.itemList;
+        }
+
+        #endregion
+
+        #region Event
+
         private void OnItemUsed(ItemName itemName)
         {
             int index = _itemList.IndexOf(itemName);
@@ -43,17 +81,6 @@ namespace Assets.Scripts.Inventory.Logic
                 int newIndex = Mathf.Clamp(index, 0, _itemList.Count - 1);
                 EventBus.CallUIUpdated(_itemData.GetItemDetails(_itemList[newIndex]), newIndex);
             }
-        }
-
-        public void AddItem(ItemName itemName)
-        {
-            if (_itemList.Contains(itemName))
-                return;
-
-            _itemList.Add(itemName);
-            int index = _itemList.IndexOf(itemName);
-
-            EventBus.CallUIUpdated(_itemData.GetItemDetails(itemName), index);
         }
 
         private void OnItemSwitched(int index)
@@ -83,5 +110,7 @@ namespace Assets.Scripts.Inventory.Logic
             _itemList.Clear();
             EventBus.CallUIUpdated(null, -1);
         }
+
+        #endregion
     }
 }
