@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ba36d7737eec9a41b3f7a7376a35e42, type: 3}
-  m_Name: SO_MiniGameH2AData_Week1
+  m_Name: SO_MiniGameH2AData_Week2
   m_EditorClassIdentifier: 
   gameName: 6
   ballDetailsList:
@@ -36,25 +36,21 @@ MonoBehaviour:
   - from: 0
     to: 1
   - from: 0
+    to: 6
+  - from: 1
     to: 2
-  - from: 0
-    to: 3
-  - from: 0
+  - from: 1
     to: 4
-  - from: 0
-    to: 5
-  - from: 0
+  - from: 1
     to: 6
-  - from: 1
-    to: 2
-  - from: 1
+  - from: 2
     to: 3
-  - from: 1
-    to: 6
+  - from: 2
+    to: 5
   - from: 3
     to: 4
+  - from: 3
+    to: 6
   - from: 4
-    to: 6
-  - from: 5
-    to: 6
+    to: 5
   startOrder: 00000000060000000500000004000000030000000200000001000000

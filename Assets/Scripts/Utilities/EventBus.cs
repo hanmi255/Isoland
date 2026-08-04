@@ -67,5 +67,12 @@ namespace Assets.Scripts.Utilities
         {
             GameCompletedEvent?.Invoke(gameName);
         }
+
+        // 新周目开始事件
+        public static event Action<int> NewWeekStartedEvent;
+        public static void CallNewWeekStarted(int week)
+        {
+            NewWeekStartedEvent?.Invoke(week);
+        }
     }
 }

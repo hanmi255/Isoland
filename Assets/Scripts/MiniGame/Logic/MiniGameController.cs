@@ -10,17 +10,13 @@ namespace Assets.Scripts.MiniGame.Logic
         [SerializeField] private UnityEvent _onGameComplete;
 
         [Header("组件引用")]
-        [SerializeField] private SO_MiniGameH2AData _data;
+        [SerializeField] private SO_MiniGameH2AData[] _dataList;
         [SerializeField] private GameObject _lineParent;
         [SerializeField] private LineRenderer _linePrefab;
         [SerializeField] private Ball _ballPrefab;
         [SerializeField] private Transform[] _holes;
 
-        private void Start()
-        {
-            DrawLine();
-            CreateBall();
-        }
+        private SO_MiniGameH2AData _data;
 
         private void OnEnable()
         {
@@ -32,7 +28,24 @@ namespace Assets.Scripts.MiniGame.Logic
             EventBus.CheckMiniGameCompletedEvent -= OnCheckGameCompleted;
         }
 
-        public void DrawLine()
+        public void SetNewWeekData(int week)
+        {
+            _data = _dataList[week];
+            DrawLine();
+            CreateBall();
+        }
+
+        public void ResetGame()
+        {
+            // 删除 Ball 之后重新创建
+            foreach (var ball in FindObjectsOfType<Ball>())
+            {
+                Destroy(ball.gameObject);
+            }
+            CreateBall();
+        }
+
+        private void DrawLine()
         {
             foreach (var connections in _data.lineConnections)
             {
@@ -46,7 +59,7 @@ namespace Assets.Scripts.MiniGame.Logic
             }
         }
 
-        public void CreateBall()
+        private void CreateBall()
         {
             for (int i = 0; i < _data.startOrder.Count; i++)
             {
@@ -61,16 +74,6 @@ namespace Assets.Scripts.MiniGame.Logic
                 ball.SetupBall(_data.GetBallDetails(_data.startOrder[i]));
                 _holes[i].GetComponent<Hole>().CheckBall(ball);
             }
-        }
-
-        public void ResetGame()
-        {
-            // 删除 Ball 之后重新创建
-            foreach (var ball in FindObjectsOfType<Ball>())
-            {
-                Destroy(ball.gameObject);
-            }
-            CreateBall();
         }
 
         private void OnCheckGameCompleted()

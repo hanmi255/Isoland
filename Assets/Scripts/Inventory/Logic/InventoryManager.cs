@@ -18,6 +18,7 @@ namespace Assets.Scripts.Inventory.Logic
             EventBus.ItemUsedEvent += OnItemUsed;
             EventBus.ItemSwitchedEvent += OnItemSwitched;
             EventBus.AfterSceneLoadEvent += OnAfterSceneLoad;
+            EventBus.NewWeekStartedEvent += OnNewWeekStarted;
         }
 
         private void OnDisable()
@@ -25,6 +26,7 @@ namespace Assets.Scripts.Inventory.Logic
             EventBus.ItemUsedEvent -= OnItemUsed;
             EventBus.ItemSwitchedEvent -= OnItemSwitched;
             EventBus.AfterSceneLoadEvent -= OnAfterSceneLoad;
+            EventBus.NewWeekStartedEvent -= OnNewWeekStarted;
         }
 
         private void OnItemUsed(ItemName itemName)
@@ -73,6 +75,13 @@ namespace Assets.Scripts.Inventory.Logic
             {
                 EventBus.CallUIUpdated(_itemData.GetItemDetails(_itemList[0]), 0);
             }
+        }
+
+        private void OnNewWeekStarted(int week)
+        {
+            // 清空背包，准备新一周
+            _itemList.Clear();
+            EventBus.CallUIUpdated(null, -1);
         }
     }
 }

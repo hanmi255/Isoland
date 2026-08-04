@@ -61,7 +61,17 @@ namespace Assets.Scripts.Transition
             _fadeCanvasGroup.alpha = 1;
 
             // StartCoroutine(Fade(0f));
-            StartCoroutine(FadeAndSwitchScenes(_startScene));
+            StartCoroutine(FadeAndSwitchScenes(SceneName.MainMenu));
+        }
+
+        private void OnEnable()
+        {
+            EventBus.NewWeekStartedEvent += OnNewWeekStarted;
+        }
+
+        private void OnDisable()
+        {
+            EventBus.NewWeekStartedEvent -= OnNewWeekStarted;
         }
 
         #endregion
@@ -147,6 +157,15 @@ namespace Assets.Scripts.Transition
             _isFading = false;
 
             _fadeCanvasGroup.blocksRaycasts = false;
+        }
+
+        #endregion
+
+        #region Event
+
+        private void OnNewWeekStarted(int week)
+        {
+            FadeAndLoadScene(_startScene);
         }
 
         #endregion

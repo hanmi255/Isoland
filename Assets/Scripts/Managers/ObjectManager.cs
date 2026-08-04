@@ -14,12 +14,16 @@ namespace Assets.Scripts.Managers
         private readonly Dictionary<string, bool> _interactiveObjectUsedDic = new();
         private readonly Dictionary<SceneName, bool> _miniGamePassedDic = new();
 
+        private int _currentWeek;
+        private MiniGameController _currentMiniGameController;
+
         private void OnEnable()
         {
             EventBus.BeforeSceneUnloadEvent += OnBeforeSceneUnload;
             EventBus.AfterSceneLoadEvent += OnAfterSceneLoad;
             EventBus.UIUpdateEvent += OnUIUpdate;
             EventBus.GameCompletedEvent += OnGameCompleted;
+            EventBus.NewWeekStartedEvent += OnNewWeekStarted;
         }
 
         private void OnDisable()
@@ -28,6 +32,7 @@ namespace Assets.Scripts.Managers
             EventBus.AfterSceneLoadEvent -= OnAfterSceneLoad;
             EventBus.UIUpdateEvent -= OnUIUpdate;
             EventBus.GameCompletedEvent -= OnGameCompleted;
+            EventBus.NewWeekStartedEvent -= OnNewWeekStarted;
         }
 
         private void OnBeforeSceneUnload()
@@ -109,6 +114,10 @@ namespace Assets.Scripts.Managers
                     _miniGamePassedDic.Add(game.GameName, game.IsCompleted);
                 }
             }
+
+            // 设置当前小游戏控制器
+            _currentMiniGameController = FindObjectOfType<MiniGameController>();
+            _currentMiniGameController?.SetNewWeekData(_currentWeek);
         }
 
         // 拾取物品后，将场景中的物体隐藏
@@ -123,6 +132,15 @@ namespace Assets.Scripts.Managers
         private void OnGameCompleted(SceneName gameName)
         {
             _miniGamePassedDic[gameName] = true;
+        }
+
+        private void OnNewWeekStarted(int week)
+        {
+            _currentWeek = week;
+            // 清空所有状态，准备新一周
+            _itemAvailableDic.Clear();
+            _interactiveObjectUsedDic.Clear();
+            _miniGamePassedDic.Clear();
         }
     }
 }

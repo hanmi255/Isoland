@@ -3,6 +3,7 @@ namespace Assets.Scripts.Utilities
     public enum SceneName
     {
         PersistentScene,
+        MainMenu,
         H1,
         H2,
         H3,
